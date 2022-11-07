@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import Location from 'src/interfaces/location.interface';
 import { User } from './user.model';
 
 export const RestaurantSchema = new mongoose.Schema({
@@ -37,11 +38,6 @@ export interface Restaurant extends mongoose.Document {
   name: string;
   uniqueName: string;
   cuisine: string;
-  location: {
-    type: string;
-    coordinates: {
-      type: number[];
-    };
-  };
+  location: Location;
   owner: User;
 }
