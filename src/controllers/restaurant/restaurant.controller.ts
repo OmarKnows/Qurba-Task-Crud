@@ -1,6 +1,5 @@
 import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import Location from 'src/interfaces/location.interface';
-import { User } from 'src/models/user.model';
 import { RestaurantService } from './restaurant.service';
 
 @Controller('restaurants')
@@ -13,14 +12,14 @@ export class RestaurantController {
     @Body('uniqueName') uniqueName: string,
     @Body('cuisine') cuisine: string,
     @Body('location') location: Location,
-    @Body('owner') owner: User,
+    @Body('ownerId') ownerId: string,
   ) {
     const generatedId = await this.restaurantService.insertRestaurant(
       name,
       uniqueName,
       cuisine,
       location,
-      owner,
+      ownerId,
     );
     return { id: generatedId };
   }
@@ -36,7 +35,7 @@ export class RestaurantController {
     return await this.restaurantService.getRestaurantDetailsById(id);
   }
 
-  @Get('nearme')
+  @Post('nearme')
   async getNearbyRestaurants(@Body('location') location: Location) {
     const restaurants = await this.restaurantService.getNearbyRestaurants(
       location,

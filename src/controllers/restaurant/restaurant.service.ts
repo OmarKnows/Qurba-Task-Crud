@@ -2,9 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import Location from 'src/interfaces/location.interface';
-
 import { Restaurant } from 'src/models/restaurant.model';
-import { User } from 'src/models/user.model';
 
 @Injectable()
 export class RestaurantService {
@@ -18,14 +16,14 @@ export class RestaurantService {
     uniqueName: string,
     cuisine: string,
     location: Location,
-    owner: User,
+    ownerId: string,
   ) {
     const newRestaurant = new this.restaurantModel({
       name,
       uniqueName,
       cuisine,
       location,
-      owner,
+      ownerId,
     });
     const result = await newRestaurant.save();
     return result.id as string;
@@ -81,7 +79,7 @@ export class RestaurantService {
       uniqueName: restaurant.uniqueName,
       cuisine: restaurant.cuisine,
       location: restaurant.location,
-      owner: restaurant.owner,
+      owner: restaurant.ownerId,
     };
   }
 

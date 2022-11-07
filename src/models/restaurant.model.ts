@@ -9,6 +9,7 @@ export const RestaurantSchema = new mongoose.Schema({
   },
   uniqueName: {
     type: String,
+    unique: true,
     required: true,
   },
   cuisine: {
@@ -33,11 +34,12 @@ export const RestaurantSchema = new mongoose.Schema({
   },
 });
 
+RestaurantSchema.index({ location: '2dsphere' });
 export interface Restaurant extends mongoose.Document {
   id: string;
   name: string;
   uniqueName: string;
   cuisine: string;
   location: Location;
-  owner: User;
+  ownerId: string;
 }
