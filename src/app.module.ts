@@ -5,6 +5,8 @@ import { RestaurantModule } from './modules/restaurant.module';
 import { UserModule } from './modules/user.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { APP_FILTER } from '@nestjs/core';
+import { allExceptionsFilter } from './allExceptions.filter';
 
 @Module({
   imports: [
@@ -16,6 +18,12 @@ import { AppService } from './app.service';
     MongooseModule.forRoot(process.env.MONGO_URI),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: allExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
