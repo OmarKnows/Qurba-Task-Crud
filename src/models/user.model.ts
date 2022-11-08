@@ -8,11 +8,12 @@ export const UserSchema = new mongoose.Schema({
   },
   favoriteCuisines: {
     type: [String],
+    required: true,
   },
   restaurants: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Restaurant'
-  }
+    ref: 'Restaurant',
+  },
 });
 
 export interface User extends mongoose.Document {

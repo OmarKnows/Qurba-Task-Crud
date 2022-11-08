@@ -1,7 +1,6 @@
-import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import Location from 'src/interfaces/location.interface';
 import { RestaurantService } from './restaurant.service';
-
 @Controller('restaurants')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
