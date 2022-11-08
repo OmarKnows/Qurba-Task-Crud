@@ -29,20 +29,23 @@ export class RestaurantService {
     return result.id as string;
   }
 
-  async getRestaurants() {
-    const restaurants = await this.restaurantModel.find().exec();
-    return restaurants.map((restaurant) => ({
-      name: restaurant.name,
-    }));
-  }
+  async getRestaurants(params: any) {
+    const {cuisine} = params
 
-  async getRestaurantsByCuisine(cuisine: string) {
-    const restaurants = await this.restaurantModel
-      .find({ cuisine: cuisine })
-      .exec();
-    return restaurants.map((restaurant) => ({
-      name: restaurant.name,
-    }));
+    if (cuisine) {
+      const restaurants = await this.restaurantModel
+        .find({ cuisine: cuisine })
+        .exec();
+      return restaurants.map((restaurant) => ({
+        name: restaurant.name,
+      }));
+    }
+    else {
+      const restaurants = await this.restaurantModel.find().exec();
+      return restaurants.map((restaurant) => ({
+        name: restaurant.name,
+      }));
+    }
   }
 
   async getNearbyRestaurants(location: Location) {
@@ -59,43 +62,33 @@ export class RestaurantService {
     }));
   }
 
-  //   async getRestaurantDetailsByUniqueName(uniqueName: string) {
-  //     const restaurant = await this.findRestaurant(id);
-  //     return {
-  //       id: restaurant.id,
-  //       name: restaurant.name,
-  //       uniqueName: restaurant.uniqueName,
-  //       cuisine: restaurant.cuisine,
-  //       location: restaurant.location,
-  //       owner: restaurant.owner,
-  //     };
-  //   }
-
-  async getRestaurantDetailsById(id: string) {
-    const restaurant = await this.findRestaurant(id);
+  async getRestaurantDetailsByUniqueName(uniqueName: string) {
+    const restaurant = await this.restaurantModel.findOne({
+      uniqueName: uniqueName,
+    });
     return {
       id: restaurant.id,
       name: restaurant.name,
       uniqueName: restaurant.uniqueName,
       cuisine: restaurant.cuisine,
       location: restaurant.location,
-      owner: restaurant.ownerId,
+      ownerId: restaurant.ownerId,
     };
   }
 
-  private async findRestaurant(id: string): Promise<Restaurant> {
-    let restaurant: Restaurant | PromiseLike<Restaurant>;
+  async getRestaurantDetails(params: any) {
+    const { id, uniqueName} = params
+    var restaurant
 
-    try {
-      restaurant = await this.restaurantModel.findById(id).exec();
-    } catch (error) {
-      throw new NotFoundException('Could not find restaurant.');
-    }
-
-    if (!restaurant) {
-      throw new NotFoundException('Could not find restaurant.');
-    }
-
-    return restaurant;
+    if(id) restaurant = await this.restaurantModel.findById(id);
+    else if(uniqueName) restaurant = await this.restaurantModel.findOne({uniqueName: uniqueName})
+    return {
+      id: restaurant.id,
+      name: restaurant.name,
+      uniqueName: restaurant.uniqueName,
+      cuisine: restaurant.cuisine,
+      location: restaurant.location,
+      ownerId: restaurant.ownerId,
+    };
   }
 }

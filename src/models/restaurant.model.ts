@@ -27,7 +27,7 @@ export const RestaurantSchema = new mongoose.Schema({
       required: true,
     },
   },
-  owner: {
+  ownerId: {
     type: mongoose.Types.ObjectId,
     ref: 'User',
     required: true,

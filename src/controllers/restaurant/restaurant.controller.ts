@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Query } from '@nestjs/common';
 import Location from 'src/interfaces/location.interface';
 import { RestaurantService } from './restaurant.service';
 
@@ -25,14 +25,14 @@ export class RestaurantController {
   }
 
   @Get()
-  async getRestaurants() {
-    const restaurants = await this.restaurantService.getRestaurants();
+  async getRestaurants(@Query() params: any) {
+    const restaurants = await this.restaurantService.getRestaurants(params);
     return restaurants;
   }
 
-  @Get(':id')
-  async getRestaurantById(@Param('id') id: string) {
-    return await this.restaurantService.getRestaurantDetailsById(id);
+  @Get('details')
+  async getRestaurantById(@Query() params: any) {
+    return await this.restaurantService.getRestaurantDetails(params);
   }
 
   @Post('nearme')
