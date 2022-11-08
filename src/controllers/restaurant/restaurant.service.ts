@@ -11,26 +11,20 @@ export class RestaurantService {
     private readonly restaurantModel: Model<Restaurant>,
   ) {}
 
-  async insertRestaurant(
-    name: string,
-    uniqueName: string,
-    cuisine: string,
-    location: Location,
-    ownerId: string,
-  ) {
+  async insertRestaurant(restaurant: Restaurant) {
     const newRestaurant = new this.restaurantModel({
-      name,
-      uniqueName,
-      cuisine,
-      location,
-      ownerId,
+      name: restaurant.name,
+      uniqueName: restaurant.uniqueName,
+      cuisine: restaurant.cuisine,
+      location: restaurant.location,
+      ownerId: restaurant.ownerId,
     });
     const result = await newRestaurant.save();
     return result.id as string;
   }
 
   async getRestaurants(params: any) {
-    const {cuisine} = params
+    const { cuisine } = params;
 
     if (cuisine) {
       const restaurants = await this.restaurantModel
@@ -39,8 +33,7 @@ export class RestaurantService {
       return restaurants.map((restaurant) => ({
         name: restaurant.name,
       }));
-    }
-    else {
+    } else {
       const restaurants = await this.restaurantModel.find().exec();
       return restaurants.map((restaurant) => ({
         name: restaurant.name,
@@ -77,11 +70,14 @@ export class RestaurantService {
   }
 
   async getRestaurantDetails(params: any) {
-    const { id, uniqueName} = params
-    var restaurant
+    const { id, uniqueName } = params;
+    var restaurant;
 
-    if(id) restaurant = await this.restaurantModel.findById(id);
-    else if(uniqueName) restaurant = await this.restaurantModel.findOne({uniqueName: uniqueName})
+    if (id) restaurant = await this.restaurantModel.findById(id);
+    else if (uniqueName)
+      restaurant = await this.restaurantModel.findOne({
+        uniqueName: uniqueName,
+      });
     return {
       id: restaurant.id,
       name: restaurant.name,

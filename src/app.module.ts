@@ -20,10 +20,10 @@ import { allExceptionsFilter } from './allExceptions.filter';
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_FILTER,
-      useClass: allExceptionsFilter,
-    },
+    // {
+    //   provide: APP_FILTER,
+    //   useClass: allExceptionsFilter,
+    // },
   ],
 })
 export class AppModule {}

@@ -1,24 +1,15 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import Location from 'src/interfaces/location.interface';
+import { Restaurant } from 'src/models/restaurant.model';
 import { RestaurantService } from './restaurant.service';
 @Controller('restaurants')
 export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Post()
-  async insertRestaurant(
-    @Body('name') name: string,
-    @Body('uniqueName') uniqueName: string,
-    @Body('cuisine') cuisine: string,
-    @Body('location') location: Location,
-    @Body('ownerId') ownerId: string,
-  ) {
+  async insertRestaurant(@Body() restaurant: Restaurant) {
     const generatedId = await this.restaurantService.insertRestaurant(
-      name,
-      uniqueName,
-      cuisine,
-      location,
-      ownerId,
+      restaurant,
     );
     return { id: generatedId };
   }
