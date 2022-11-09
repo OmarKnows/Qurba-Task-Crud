@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import Location from 'src/interfaces/location.interface';
 import { Restaurant } from 'src/models/restaurant.model';
 import { User } from 'src/models/user.model';
@@ -50,7 +50,42 @@ export class RestaurantService {
       }));
     }
   }
+  
+  async getRestaurantDetailsById(id: string) {
+    try {
+      const restaurant = await this.restaurantModel.findById(id);
+      return {
+        id: restaurant.id,
+        name: restaurant.name,
+        uniqueName: restaurant.uniqueName,
+        cuisine: restaurant.cuisine,
+        location: restaurant.location,
+        ownerId: restaurant.ownerId,
+      };
+      
+    } catch (error) {
+      throw new NotFoundException(`Could not find restaurant with the ID ${id}`)
+    }
+  }
 
+  async getRestaurantDetailsByUniqueName(uniqueName: string) {
+    try {
+       const restaurant = await this.restaurantModel.findOne({
+          uniqueName: uniqueName,
+        });
+      return {
+        id: restaurant.id,
+        name: restaurant.name,
+        uniqueName: restaurant.uniqueName,
+        cuisine: restaurant.cuisine,
+        location: restaurant.location,
+         ownerId: restaurant.ownerId,
+       };
+      
+     } catch (error) {
+       throw new NotFoundException(`Could not find restaurant with the unique name ${uniqueName}`)
+    }
+  }
   async getNearbyRestaurants(location: Location) {
     const restaurants = await this.restaurantModel.find({
       location: {
@@ -65,26 +100,5 @@ export class RestaurantService {
     }));
   }
 
-  async getRestaurantDetails(params: any) {
-    const { id, uniqueName } = params;
-    let restaurant: Document<unknown, any, Restaurant> & Restaurant & { _id: Types.ObjectId; };
-    try {
-      if (id) restaurant = await this.restaurantModel.findById(id);
-      else if (uniqueName)
-        restaurant = await this.restaurantModel.findOne({
-          uniqueName: uniqueName,
-        });
-      return {
-        id: restaurant.id,
-        name: restaurant.name,
-        uniqueName: restaurant.uniqueName,
-        cuisine: restaurant.cuisine,
-        location: restaurant.location,
-        ownerId: restaurant.ownerId,
-      };
-      
-    } catch (error) {
-      throw new NotFoundException
-    }
-  }
+
 }
