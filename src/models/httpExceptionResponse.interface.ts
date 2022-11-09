@@ -1,3 +1,5 @@
+//interface for handling the exception response implemented in the interceptor "allExceptions.filter.ts"
+
 export interface HttpExceptionResponse {
   statusCode: number;
   message: string;

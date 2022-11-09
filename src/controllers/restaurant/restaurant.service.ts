@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import Location from 'src/interfaces/location.interface';
+import Location from 'src/models/location.class';
 import { Restaurant } from 'src/models/restaurant.model';
 import { User } from 'src/models/user.model';
 
@@ -15,6 +15,7 @@ export class RestaurantService {
   ) {}
 
   async insertRestaurant(restaurant: Restaurant) {
+    //creating the new restaurant
     const newRestaurant = new this.restaurantModel({
       name: restaurant.name,
       uniqueName: restaurant.uniqueName,
@@ -23,16 +24,19 @@ export class RestaurantService {
       ownerId: restaurant.ownerId,
     });
     const result = await newRestaurant.save();
+    //pushing the created restaurant to the owners restaurant array
     const owner = await this.userModel.findById(restaurant.ownerId)
     owner.restaurants.push(newRestaurant)
     await owner.save();
     return { message: "Restaurant successfuly inserted", id: result.id}
   }
 
+  //for this function I decided to return only the name, uniqueName & _id based on the wording on feature 3 "list all restaurants" as opposed to feature 4 "DETAILS of a restaurant"
   async getRestaurants(params: any) {
     const { cuisine } = params;
 
     if (cuisine) {
+      //finds all restaurants with the given cuisine if cuisine provided
       const restaurants = await this.restaurantModel
         .find({ cuisine: cuisine })
         .exec();
@@ -42,6 +46,7 @@ export class RestaurantService {
         id: restaurant._id
       }));
     } else {
+      //returns all restaurants if no cuisine provided
       const restaurants = await this.restaurantModel.find().exec();
       return restaurants.map((restaurant) => ({
         name: restaurant.name,
@@ -64,6 +69,7 @@ export class RestaurantService {
       };
       
     } catch (error) {
+      //not found exception is required here for the interceptor to return 404 because of how mongo handles an invalid id
       throw new NotFoundException(`Could not find restaurant with the ID ${id}`)
     }
   }
@@ -83,10 +89,12 @@ export class RestaurantService {
        };
       
      } catch (error) {
+      //not found exception is required here for the interceptor to return 404 because of how mongo handles an invalid id
        throw new NotFoundException(`Could not find restaurant with the unique name ${uniqueName}`)
     }
   }
   async getNearbyRestaurants(location: Location) {
+    //returns restaurants within 1000 meters of given location
     const restaurants = await this.restaurantModel.find({
       location: {
         $near: {
@@ -97,8 +105,7 @@ export class RestaurantService {
     });
     return restaurants.map((restaurant) => ({
       name: restaurant.name,
+      location: restaurant.location.coordinates
     }));
   }
-
-
 }

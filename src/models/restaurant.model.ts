@@ -1,7 +1,8 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, IsNotEmpty, ValidateNested } from 'class-validator';
 import * as mongoose from 'mongoose';
-import Location from 'src/interfaces/location.interface';
+import Location from 'src/models/location.class';
 
 export const RestaurantSchema = new mongoose.Schema({
   name: {
@@ -17,6 +18,7 @@ export const RestaurantSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  //location is implemented using GeoJSON objects
   location: {
     type: {
       type: String,
@@ -28,6 +30,7 @@ export const RestaurantSchema = new mongoose.Schema({
       required: true,
     },
   },
+  //each restaurant is required to have an owner of type User, this is a ref to the user model
   ownerId: {
     type: mongoose.Types.ObjectId,
     ref: 'User',
@@ -35,21 +38,35 @@ export const RestaurantSchema = new mongoose.Schema({
   },
 });
 
-RestaurantSchema.index({ uniqueName: 1})
-RestaurantSchema.index({ cuisine: 1})
+//uniqueName, cuisine & location are indexed because these are the fields that have queries performed on them
+//note: cannot perform geospatial queries on a location without indexing it first.
+RestaurantSchema.index({ uniqueName: 1 });
+RestaurantSchema.index({ cuisine: 1 });
 RestaurantSchema.index({ location: '2dsphere' });
 
 export class Restaurant {
+  //all fields that are input by the user are validated to not be empty, to exist & to be of correct type
+  @ApiProperty({ type: String })
   id: string;
-  @IsNotEmpty() @IsString()
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String })
   name: string;
-  @IsNotEmpty() @IsString()
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String })
   uniqueName: string;
-  @IsNotEmpty() @IsString()
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String })
   cuisine: string;
-  @IsNotEmpty() @ValidateNested()
+  @IsNotEmpty()
+  @ValidateNested()
   @Type(() => Location)
+  @ApiProperty({ type: Location })
   location: Location;
-  @IsNotEmpty() @IsString()
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({ type: String })
   ownerId: string;
 }

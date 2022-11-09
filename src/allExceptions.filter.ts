@@ -9,7 +9,7 @@ import { Request, Response } from 'express';
 import {
   CustomHttpExceptionResponse,
   HttpExceptionResponse,
-} from './interfaces/httpExceptionResponse.interface';
+} from './models/httpExceptionResponse.interface';
 
 @Catch()
 export class allExceptionsFilter implements ExceptionFilter {
@@ -32,11 +32,13 @@ export class allExceptionsFilter implements ExceptionFilter {
 
     } else {
       switch(exception.code){
+        //returns bad request incase mongoDB returns a duplicate entry exception
         case 11000:
           status = HttpStatus.BAD_REQUEST;
           msg = `${exception.keyValue.uniqueName} already exists`
           err = 'Bad Request'
           break;
+        //if duplicate entry exception isn't thrown, returns internal server error indicating a flaw in the backend logic
         default:
           status = HttpStatus.INTERNAL_SERVER_ERROR;
           err = 'Internal server error occurred: ';

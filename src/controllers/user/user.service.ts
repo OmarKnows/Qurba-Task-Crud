@@ -10,10 +10,21 @@ export class UserService {
     private readonly userModel: Model<User>,
   ) {}
 
+  //this function was not part of the task however was implemented for testing purposes
+  async insertUser(user: User) {
+    const newUser = new this.userModel({
+      fullName: user.fullName,
+      favoriteCuisines: user.favoriteCuisines,
+      restaurants: user.restaurants,
+    });
+    const result = await newUser.save();
+    return { message: "User successfuly inserted", id: result.id}
+  }
+
   async getUsersByCuisine(params: any) {
     const { cuisine } = params;
     const users = await this.userModel.aggregate([
-      {
+      {//this stage performas a join and adds stage a new array field "results" containing the matching documents from the joined collection "restaurants".
         $lookup: {
           from: 'restaurants',
           localField: 'restaurants',
@@ -21,7 +32,7 @@ export class UserService {
           as: 'result',
         },
       },
-      {
+      {//this stage finds users with the given cuisine OR users that own a restaurant with the given cuisine
         $match: {
           $or: [
             {
@@ -35,7 +46,7 @@ export class UserService {
           ],
         },
       },
-      {
+      {//this stage projects only the _id and fullName of users returned from the previous stage
         $project: {
           restaurants: 0,
           result: 0,
