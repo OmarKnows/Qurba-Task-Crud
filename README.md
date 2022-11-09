@@ -28,3 +28,7 @@ Start the server
   npm run start:dev
 ```
 
+```bash
+  navigate to http://localhost:3000/api
+```
+
