@@ -13,38 +13,50 @@ import {
 
 @Catch()
 export class allExceptionsFilter implements ExceptionFilter {
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: any, host: ArgumentsHost) {
     const context = host.switchToHttp();
 
     const request = context.getRequest<Request>();
     const response = context.getResponse<Response>();
 
     let status: HttpStatus;
-    let errorMessage: string;
+    let msg: string;
+    let err: string;
 
     if (exception instanceof HttpException) {
-      status = exception.getStatus();
       const errorResponse = exception.getResponse();
 
-      errorMessage =
-        (errorResponse as HttpExceptionResponse).error || exception.message;
+      status = exception.getStatus();
+      msg = (errorResponse as HttpExceptionResponse).message[0]
+      err = (errorResponse as HttpExceptionResponse).error || exception.message;
+
     } else {
-      status = HttpStatus.INTERNAL_SERVER_ERROR;
-      errorMessage = 'Internal server error occurred';
+      switch(exception.code){
+        case 11000:
+          status = HttpStatus.BAD_REQUEST;
+          msg = `${exception.keyValue.uniqueName} already exists`
+          err = 'Bad Request'
+          break;
+        default:
+          status = HttpStatus.INTERNAL_SERVER_ERROR;
+          err = 'Internal server error occurred: ';
+      }   
     }
 
-    const errorResponse = this.getErrorResponse(status, errorMessage, request);
+    const errorResponse = this.getErrorResponse(status, err, request, msg);
     response.status(status).json(errorResponse);
   }
 
   private getErrorResponse(
     status: HttpStatus,
-    errorMessage: string,
+    err: string,
     request: Request,
+    msg: string
   ): CustomHttpExceptionResponse {
     return {
       statusCode: status,
-      error: errorMessage,
+      error: err,
+      message: msg,
       path: request.url,
       method: request.method,
       timeStamp: new Date(),

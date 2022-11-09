@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/models/user.model';
@@ -37,10 +37,10 @@ export class UserService {
       },
       {
         $project: {
-          _id: 0,
           restaurants: 0,
           result: 0,
           favoriteCuisines: 0,
+          __v: 0
         },
       },
     ]);

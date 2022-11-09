@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsString, IsNotEmpty, ValidateNested } from 'class-validator';
 import * as mongoose from 'mongoose';
 import Location from 'src/interfaces/location.interface';
 
@@ -34,13 +35,21 @@ export const RestaurantSchema = new mongoose.Schema({
   },
 });
 
+RestaurantSchema.index({ uniqueName: 1})
+RestaurantSchema.index({ cuisine: 1})
 RestaurantSchema.index({ location: '2dsphere' });
+
 export class Restaurant {
   id: string;
-  @IsNotEmpty()
+  @IsNotEmpty() @IsString()
   name: string;
+  @IsNotEmpty() @IsString()
   uniqueName: string;
+  @IsNotEmpty() @IsString()
   cuisine: string;
+  @IsNotEmpty() @ValidateNested()
+  @Type(() => Location)
   location: Location;
+  @IsNotEmpty() @IsString()
   ownerId: string;
 }
