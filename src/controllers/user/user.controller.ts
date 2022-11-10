@@ -3,6 +3,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from 'src/models/user.model';
@@ -15,6 +16,7 @@ export class UserController {
   //get a list of users for a specific cuisine
   @Get()
   @ApiTags('user')
+  @ApiQuery({ name: 'cuisine'})
   @ApiOkResponse({
     description: 'Gets a list of users for a specific cuisine',
   })

@@ -3,15 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import Location from 'src/models/location.class';
 import { Restaurant } from 'src/models/restaurant.model';
-import { User } from 'src/models/user.model';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectModel('Restaurant')
     private readonly restaurantModel: Model<Restaurant>,
-    @InjectModel('User')
-    private readonly userModel: Model<User>,
   ) {}
 
   async insertRestaurant(restaurant: Restaurant) {
@@ -25,9 +22,6 @@ export class RestaurantService {
     });
     const result = await newRestaurant.save();
     //pushing the created restaurant to the owners restaurant array
-    const owner = await this.userModel.findById(restaurant.ownerId)
-    owner.restaurants.push(newRestaurant)
-    await owner.save();
     return { message: "Restaurant successfuly inserted", id: result.id}
   }
 

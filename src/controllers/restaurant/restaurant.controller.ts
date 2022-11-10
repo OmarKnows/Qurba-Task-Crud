@@ -70,7 +70,7 @@ export class RestaurantController {
   //posts a GeoJSON object (a location) and returns a list of restaurants and their locations near the given location
   @Post('nearme')
   @ApiTags('restaurant')
-  @ApiOkResponse({
+  @ApiCreatedResponse({
     description:
       'Posts a GeoJSON object (a location) and returns a list of restaurants and their locations near the given location',
   })

@@ -46,7 +46,6 @@ RestaurantSchema.index({ location: '2dsphere' });
 
 export class Restaurant {
   //all fields that are input by the user are validated to not be empty, to exist & to be of correct type
-  @ApiProperty({ type: String })
   id: string;
   @IsNotEmpty()
   @IsString()
