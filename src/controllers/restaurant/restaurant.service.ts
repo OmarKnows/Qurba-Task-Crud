@@ -1,17 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import Location from 'src/models/location.class';
 import { Restaurant } from 'src/models/restaurant.model';
+import { UserRestaurant } from 'src/models/userRestaurant.model';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectModel('Restaurant')
     private readonly restaurantModel: Model<Restaurant>,
+    @InjectModel('UserRestaurant')
+    private readonly userRestaurantModel: Model<UserRestaurant>,
   ) {}
 
   async insertRestaurant(restaurant: Restaurant) {
+
     //creating the new restaurant
     const newRestaurant = new this.restaurantModel({
       name: restaurant.name,
@@ -21,7 +25,18 @@ export class RestaurantService {
       ownerId: restaurant.ownerId,
     });
     const result = await newRestaurant.save();
-    //pushing the created restaurant to the owners restaurant array
+    
+    const newUserRestaurant = new this.userRestaurantModel({
+      userId: result.ownerId,
+      restaurantCuisine: result.cuisine
+    })
+    var id = new mongoose.Types.ObjectId(result.ownerId)
+
+    this.userRestaurantModel.findOneAndUpdate({userId: id}, newUserRestaurant, {upsert:true})
+    const help = await this.userRestaurantModel.find({userId: result.ownerId})
+
+    await newUserRestaurant.save()
+
     return { message: "Restaurant successfuly inserted", id: result.id}
   }
 
