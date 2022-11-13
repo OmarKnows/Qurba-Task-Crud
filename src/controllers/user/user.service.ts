@@ -21,15 +21,6 @@ export class UserService {
     });
     const result = await newUser.save();
 
-    // const newUserRestaurant = new this.userRestaurantModel({
-    //   userId: result.id,
-    //   userFavoriteCuisines: result.favoriteCuisines
-    // })
-
-    // this.userRestaurantModel.findOneAndUpdate({userId: result.id, userFavoriteCuisines: result.favoriteCuisines}, newUserRestaurant, {upsert:true})
-
-    // await newUserRestaurant.save()
-
     return { message: 'User successfuly inserted', id: result.id };
   }
 
