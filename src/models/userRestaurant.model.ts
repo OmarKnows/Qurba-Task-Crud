@@ -10,12 +10,12 @@ export const userRestaurantSchema = new mongoose.Schema({
   },
   restaurantCuisine: {
     type: String,
-  }
+  },
 });
 
 export interface UserRestaurant {
   id?: string;
-  userId: mongoose.Types.ObjectId,
+  userId?: mongoose.Types.ObjectId;
   userFavoriteCuisines?: string[];
-  restaurantCuisine: string
+  restaurantCuisine?: string[];
 }

@@ -21,47 +21,50 @@ export class UserService {
     });
     const result = await newUser.save();
 
-    const newUserRestaurant = new this.userRestaurantModel({
-      userId: result.id,
-      userFavoriteCuisines: result.favoriteCuisines
-    })
+    // const newUserRestaurant = new this.userRestaurantModel({
+    //   userId: result.id,
+    //   userFavoriteCuisines: result.favoriteCuisines
+    // })
 
-    this.userRestaurantModel.findOneAndUpdate({userId: result.id, userFavoriteCuisines: result.favoriteCuisines}, newUserRestaurant, {upsert:true})
+    // this.userRestaurantModel.findOneAndUpdate({userId: result.id, userFavoriteCuisines: result.favoriteCuisines}, newUserRestaurant, {upsert:true})
 
-    await newUserRestaurant.save()
+    // await newUserRestaurant.save()
 
-    return { message: "User successfuly inserted", id: result.id}
+    return { message: 'User successfuly inserted', id: result.id };
   }
 
   async getUsersByCuisine(params: any) {
     const { cuisine } = params;
     const users = await this.userRestaurantModel.aggregate([
       {
-        '$match': {
-          '$or': [
+        $match: {
+          $or: [
             {
-              'restaurantCuisine': `${cuisine}`
-            }, {
-              'userFavoriteCuisines': `${cuisine}`
-            }
-          ]
-        }
-      }, {
-        '$lookup': {
-          'from': 'users', 
-          'localField': 'userId', 
-          'foreignField': '_id', 
-          'as': 'Users'
-        }
-      }, {
-        '$project': {
-          '_id': 0, 
-          'userId': 1, 
-          'Users': {
-            'fullName': 1
-          }
-        }
-      }
+              restaurantCuisine: `${cuisine}`,
+            },
+            {
+              userFavoriteCuisines: `${cuisine}`,
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'Users',
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          userId: 1,
+          Users: {
+            fullName: 1,
+          },
+        },
+      },
     ]);
 
     return users;

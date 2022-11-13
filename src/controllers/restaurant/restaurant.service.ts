@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Types, Model } from 'mongoose';
 import Location from 'src/models/location.class';
 import { Restaurant } from 'src/models/restaurant.model';
+import { User } from 'src/models/user.model';
 import { UserRestaurant } from 'src/models/userRestaurant.model';
 
 @Injectable()
@@ -12,10 +13,11 @@ export class RestaurantService {
     private readonly restaurantModel: Model<Restaurant>,
     @InjectModel('UserRestaurant')
     private readonly userRestaurantModel: Model<UserRestaurant>,
+    @InjectModel('User')
+    private readonly userModel: Model<User>,
   ) {}
 
   async insertRestaurant(restaurant: Restaurant) {
-
     //creating the new restaurant
     const newRestaurant = new this.restaurantModel({
       name: restaurant.name,
@@ -26,18 +28,22 @@ export class RestaurantService {
     });
     const result = await newRestaurant.save();
 
-    const ownerObjectId = new Types.ObjectId(result.ownerId)
-    
-    const newUserRestaurant : UserRestaurant = {
+    const owner = await this.userModel.findById(result.ownerId);
+    const ownerObjectId = new Types.ObjectId(owner._id);
+
+    const newUserRestaurant: UserRestaurant = {
       userId: ownerObjectId,
-      restaurantCuisine: result.cuisine,
-    }
+      userFavoriteCuisines: owner.favoriteCuisines,
+    };
 
-    const UserRestaurant = await this.userRestaurantModel.findOneAndUpdate({userId: ownerObjectId, restaurantCuisine: result.cuisine},{$set:newUserRestaurant} , {upsert:true})
+    //something here is not right, with the current logic, it will always insert and never update, but the pipeline is still optimized so thats a plus
+    await this.userRestaurantModel.findOneAndUpdate(
+      { userId: ownerObjectId },
+      { $set: newUserRestaurant, $push: { restaurantCuisine: result.cuisine } },
+      { upsert: true },
+    );
 
-    UserRestaurant.save()
-
-    return { message: "Restaurant successfuly inserted", id: result.id}
+    return { message: 'Restaurant successfuly inserted', id: result.id };
   }
 
   //for this function I decided to return only the name, uniqueName & _id based on the wording on feature 3 "list all restaurants" as opposed to feature 4 "DETAILS of a restaurant"
@@ -52,7 +58,7 @@ export class RestaurantService {
       return restaurants.map((restaurant) => ({
         name: restaurant.name,
         uniqueName: restaurant.uniqueName,
-        id: restaurant._id
+        id: restaurant._id,
       }));
     } else {
       //returns all restaurants if no cuisine provided
@@ -60,11 +66,11 @@ export class RestaurantService {
       return restaurants.map((restaurant) => ({
         name: restaurant.name,
         uniqueName: restaurant.uniqueName,
-        id: restaurant._id
+        id: restaurant._id,
       }));
     }
   }
-  
+
   async getRestaurantDetailsById(id: string) {
     try {
       const restaurant = await this.restaurantModel.findById(id);
@@ -76,30 +82,32 @@ export class RestaurantService {
         location: restaurant.location,
         ownerId: restaurant.ownerId,
       };
-      
     } catch (error) {
       //not found exception is required here for the interceptor to return 404 because of how mongo handles an invalid id
-      throw new NotFoundException(`Could not find restaurant with the ID ${id}`)
+      throw new NotFoundException(
+        `Could not find restaurant with the ID ${id}`,
+      );
     }
   }
 
   async getRestaurantDetailsByUniqueName(uniqueName: string) {
     try {
-       const restaurant = await this.restaurantModel.findOne({
-          uniqueName: uniqueName,
-        });
+      const restaurant = await this.restaurantModel.findOne({
+        uniqueName: uniqueName,
+      });
       return {
         id: restaurant.id,
         name: restaurant.name,
         uniqueName: restaurant.uniqueName,
         cuisine: restaurant.cuisine,
         location: restaurant.location,
-         ownerId: restaurant.ownerId,
-       };
-      
-     } catch (error) {
+        ownerId: restaurant.ownerId,
+      };
+    } catch (error) {
       //not found exception is required here for the interceptor to return 404 because of how mongo handles an invalid id
-       throw new NotFoundException(`Could not find restaurant with the unique name ${uniqueName}`)
+      throw new NotFoundException(
+        `Could not find restaurant with the unique name ${uniqueName}`,
+      );
     }
   }
   async getNearbyRestaurants(location: Location) {
@@ -114,7 +122,7 @@ export class RestaurantService {
     });
     return restaurants.map((restaurant) => ({
       name: restaurant.name,
-      location: restaurant.location.coordinates
+      location: restaurant.location.coordinates,
     }));
   }
 }
