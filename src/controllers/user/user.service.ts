@@ -35,36 +35,33 @@ export class UserService {
 
   async getUsersByCuisine(params: any) {
     const { cuisine } = params;
-    const users = await this.userModel.aggregate([
-      {//this stage performas a join and adds stage a new array field "ownedRestaurants" containing the matching documents from the joined collection "restaurants".
-        $lookup: {
-          from: 'restaurants',
-          localField: '_id',
-          foreignField: 'ownerId',
-          as: 'ownedRestaurants',
-        },
-      },
-      {//this stage finds users with the given cuisine OR users that own a restaurant with the given cuisine
-        $match: {
-          $or: [
+    const users = await this.userRestaurantModel.aggregate([
+      {
+        '$match': {
+          '$or': [
             {
-              'ownedRestaurants.cuisine': {
-                $in: [`${cuisine}`],
-              },
-            },
-            {
-              favoriteCuisines: `${cuisine}`,
-            },
-          ],
-        },
-      },
-      {//this stage projects only the _id and fullName of users returned from the previous stage
-        $project: {
-          ownedRestaurants: 0,
-          favoriteCuisines: 0,
-          __v: 0
-        },
-      },
+              'restaurantCuisine': `${cuisine}`
+            }, {
+              'userFavoriteCuisines': `${cuisine}`
+            }
+          ]
+        }
+      }, {
+        '$lookup': {
+          'from': 'users', 
+          'localField': 'userId', 
+          'foreignField': '_id', 
+          'as': 'Users'
+        }
+      }, {
+        '$project': {
+          '_id': 0, 
+          'userId': 1, 
+          'Users': {
+            'fullName': 1
+          }
+        }
+      }
     ]);
 
     return users;

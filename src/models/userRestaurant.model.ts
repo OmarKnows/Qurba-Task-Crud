@@ -13,9 +13,9 @@ export const userRestaurantSchema = new mongoose.Schema({
   }
 });
 
-export interface UserRestaurant extends mongoose.Document {
-  id: string;
+export interface UserRestaurant {
+  id?: string;
   userId: mongoose.Types.ObjectId,
-  userFavoriteCuisines: string[];
+  userFavoriteCuisines?: string[];
   restaurantCuisine: string
 }
