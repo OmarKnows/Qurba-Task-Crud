@@ -28,6 +28,7 @@ export class UserService {
     const { cuisine } = params;
     const users = await this.userRestaurantModel.aggregate([
       {
+        //this stage searches the userRestaurant collection for any all documents with restaurant cuisine 'cuisine' OR user's favorite cuisine 'cuisine'
         $match: {
           $or: [
             {
@@ -40,6 +41,7 @@ export class UserService {
         },
       },
       {
+        //this lookup then populates the documents of the previous state using the ref to User collection 'userId'
         $lookup: {
           from: 'users',
           localField: 'userId',
@@ -48,6 +50,7 @@ export class UserService {
         },
       },
       {
+        //projects the userId & user fullname, structure of the schema could have been better though
         $project: {
           _id: 0,
           userId: 1,

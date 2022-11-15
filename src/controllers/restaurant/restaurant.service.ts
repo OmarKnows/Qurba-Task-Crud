@@ -28,15 +28,18 @@ export class RestaurantService {
     });
     const result = await newRestaurant.save();
 
+    //prepares the owner's id to be upserted into the soon to be created userRestaurant document
     const owner = await this.userModel.findById(result.ownerId);
     const ownerObjectId = new Types.ObjectId(owner._id);
 
+    //creates userRestaurant object to be upserted
     const newUserRestaurant: UserRestaurant = {
       userId: ownerObjectId,
       userFavoriteCuisines: owner.favoriteCuisines,
     };
 
     //something here is not right, with the current logic, it will always insert and never update, but the pipeline is still optimized so thats a plus
+    //update: changing the structure of the userRestaurant model fixed the problem mentioned in the previous comment, however the structure of the schema isn't the best so the reply is kinda ugly, could be better
     await this.userRestaurantModel.findOneAndUpdate(
       { userId: ownerObjectId },
       { $set: newUserRestaurant, $push: { restaurantCuisine: result.cuisine } },
@@ -112,6 +115,7 @@ export class RestaurantService {
   }
   async getNearbyRestaurants(location: Location) {
     //returns restaurants within 1000 meters of given location
+    //NOTE 1km = approximately 0.00898315658140985651902682470368 lat/long
     const restaurants = await this.restaurantModel.find({
       location: {
         $near: {

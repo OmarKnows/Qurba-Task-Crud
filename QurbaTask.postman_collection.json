@@ -1,0 +1,219 @@
+{
+	"info": {
+		"_postman_id": "d660e641-6abe-4862-8562-6c3df2ea65e3",
+		"name": "QurbaTask",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12313329"
+	},
+	"item": [
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "List users by cuisine (favorite cuisine or own restaurant with cuisine)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Hardee's\",\r\n    \"uniqueName\": \"Hardee's Burgers\",\r\n    \"cuisine\": \"Burgers\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [53.123,12.012]\r\n    },\r\n    \"ownerId\": \"636a465f6b18ee2023ed1541\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users/?cuisine=Pizza",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users",
+								""
+							],
+							"query": [
+								{
+									"key": "cuisine",
+									"value": "Pizza"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Insert new user (for testing purposes)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\": \"Mahmoud Okasha\",\r\n    \"favoriteCuisines\": [\"Pizza\", \"Liver\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/users",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Restaurants",
+			"item": [
+				{
+					"name": "Insert a new restaurant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Papa John's\",\r\n    \"uniqueName\": \"Papa John's Pizza\",\r\n    \"cuisine\": \"Pizza\",\r\n    \"location\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [2, 2]\r\n    },\r\n    \"ownerId\": \"636a46426b18ee2023ed1540\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/restaurants/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"restaurants",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List all restaurants (optional cuisine filter)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/restaurants/?cuisine=Burgers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"restaurants",
+								""
+							],
+							"query": [
+								{
+									"key": "cuisine",
+									"value": "Burgers"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get restaurant details by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/restaurants/id/636d1fcf9eff541953ff4e08",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"restaurants",
+								"id",
+								"636d1fcf9eff541953ff4e08"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get restaurant details by uniqueName",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/api/restaurants/uniqueName/Pizza Hut",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"restaurants",
+								"uniqueName",
+								"Pizza Hut"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List restaurants near a given location",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"type\": \"Point\",\r\n  \"coordinates\": [\r\n      2,\r\n      2.008984\r\n  ]\r\n}\r\n//1km = approximately 0.00898315658140985651902682470368 lat/long",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/restaurants/nearme",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"restaurants",
+								"nearme"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

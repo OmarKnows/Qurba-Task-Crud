@@ -9,6 +9,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
+    //swagger setup
     .setTitle('QurbaTask API')
     .setDescription(
       'My submission for Qurbas backend developer november 2022 Interview Task',
